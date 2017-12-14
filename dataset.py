@@ -15,14 +15,15 @@ class Dataset(Sequence):
         self.batch_size=batch_size
         self.size=size
         self.split_point=split_point
-        
+
     def __len__(self):
         return(math.ceil(self.size/self.batch_size))
-        
+
     def __getitem__(self, idx):
         start=idx*self.batch_size
         end=min((idx+1)*self.batch_size,self.size)
-        matrix=np.array(HDF5Matrix(self.path,'data',start,end))
+        matrix_qu=HDF5Matrix(self.path,'question',start,end)
+        matrix_im=HDF5Matrix(self.path,'image',start,end)
         answer_mat=to_categorical(np.array(HDF5Matrix(self.path,'answer',start,end)),num_classes=1000)
-        return ([matrix[:,:self.split_point],matrix[:,self.split_point:]],
+        return ([matrix_qu,matrix_im],
                 answer_mat)

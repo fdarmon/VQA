@@ -34,7 +34,7 @@ x = Dense(1000,activation = 'tanh')(x)
 classif = Activation('softmax')(x)
 model=Model(inputs=[qu,im],outputs=classif)
 
-opt=rmsprop(lr=1e-3, decay=1e-6)
+opt=rmsprop(lr=5e-4, decay=1e-6)
 
 model.compile(optimizer=opt,loss='categorical_crossentropy')
 
