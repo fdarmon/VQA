@@ -10,11 +10,10 @@ import math
 import numpy as np
 
 class Dataset(Sequence):
-    def __init__(self,path,batch_size,size,split_point):
+    def __init__(self,path,batch_size,size):
         self.path=path
         self.batch_size=batch_size
         self.size=size
-        self.split_point=split_point
 
     def __len__(self):
         return(math.ceil(self.size/self.batch_size))

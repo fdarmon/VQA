@@ -8,7 +8,9 @@ Created on Wed Dec 13 14:44:10 2017
 import numpy as np
 import h5py
 
-features_questions='result/questions_features_train.h5'
+config='train'
+
+features_questions='result/questions_features_{}.h5'.format(config)
 questions_file='data_prepro.h5'
 features_imgs='data_img.h5'
 
@@ -22,13 +24,13 @@ nb_qu,dim_qu=ques_ft.shape
 f.close()
 
 f=h5py.File(questions_file)
-img_corresp=np.array(f.get("img_pos_train"))-1
-ques_corresp=np.array(f.get("question_id_train"))
+img_corresp=np.array(f.get("img_pos_{}".format(config)))-1
+ques_corresp=np.array(f.get("question_id_{}".format(config)))
 answers=np.array(f.get('answers'))
 
 f.close()
 f=h5py.File(features_imgs)
-img_ft=np.array(f.get("images_train"))
+img_ft=np.array(f.get("images_{}".format(config)))
 nb_img,dim_img = img_ft.shape
 
 f.close()
@@ -42,12 +44,8 @@ for i in range(nb_qu):
 
 # %%
 
-f = h5py.File("dataset_train",'w')
+f = h5py.File("dataset_{}".format(config),'w')
 f.create_dataset("question",dtype='float',data=ques_ft)
 f.create_dataset("image",dtype='float',data=im_table)
 f.create_dataset("answer",dtype='int',data=answers)
 f.close()
-
-np.savetxt("images.txt",im_table)
-np.savetxt("questions.txt",ques_table)
-np.savetxt("answer",answers)

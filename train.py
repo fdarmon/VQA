@@ -7,18 +7,17 @@ Created on Wed Dec 13 13:16:14 2017
 """
 from keras.models import Model
 from keras.layers import Input, Dense, Multiply, Dropout, Activation
-from keras.optimizers import rmsprop
+from keras.optimizers import adam
 from dataset import Dataset
+import h5py
 
 training_file='dataset_train.h5'
 batch_size=32
-size=82458
+with h5py.File(training_file,'r') as f:
+    size,dim_qu=f.get("question").shape
+    dim_im = f.get("image").shape[1]
 
-dim_qu=2048
-dim_im=4096
-split_point=2048
-
-dataset=Dataset(training_file,batch_size,size,split_point)
+dataset=Dataset(training_file,batch_size,size)
 
 qu=Input(shape=(dim_qu,),name="question_input")
 x_qu = Dense(1024, activation='tanh')(qu)
@@ -34,12 +33,10 @@ x = Dense(1000,activation = 'tanh')(x)
 classif = Activation('softmax')(x)
 model=Model(inputs=[qu,im],outputs=classif)
 
-opt=rmsprop(lr=5e-4, decay=1e-6)
+opt=adam()
 
 model.compile(optimizer=opt,loss='categorical_crossentropy')
 
 model.fit_generator(dataset,epochs=2,workers=4,use_multiprocessing=False)
 
-
-
-#def perceptron():
+model.save('./trained_model')
