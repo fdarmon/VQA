@@ -12,7 +12,7 @@ from dataset import Dataset
 
 training_file='dataset_train.h5'
 batch_size=32
-size=215359
+size=82458
 
 dim_qu=2048
 dim_im=4096
@@ -34,15 +34,12 @@ x = Dense(1000,activation = 'tanh')(x)
 classif = Activation('softmax')(x)
 model=Model(inputs=[qu,im],outputs=classif)
 
-opt=rmsprop(lr=1e-5, decay=1e-6)
+opt=rmsprop(lr=1e-3, decay=1e-6)
 
 model.compile(optimizer=opt,loss='categorical_crossentropy')
-for i in range(5000):
 
-    batch_input,batch_output=dataset.getitem()
-    l=model.train_on_batch(batch_input,batch_output)
-    if i%10==0:
-        print("Loss : {} Iter {} \r".format(l,i))
+model.fit_generator(dataset,epochs=2,workers=4,use_multiprocessing=False)
+
 
 
 #def perceptron():
