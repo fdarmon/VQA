@@ -8,9 +8,9 @@ Created on Wed Dec 13 14:44:10 2017
 import numpy as np
 import h5py
 
-config='train'
+config='test'
 
-features_questions='result/questions_features_{}.h5'.format(config)
+features_questions='questions_features_{}.h5'.format(config)
 questions_file='data_prepro.h5'
 features_imgs='data_img.h5'
 
