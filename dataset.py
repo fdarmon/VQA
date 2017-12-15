@@ -10,10 +10,12 @@ import math
 import numpy as np
 
 class Dataset(Sequence):
-    def __init__(self,path,batch_size,size):
-        self.path=path
+    def __init__(self,h5_file,batch_size):
+        self.img_h5=h5_file.get("image")
+        self.qu_h5=h5_file.get("question")
+        self.ans_h5=h5_file.get("answer")
         self.batch_size=batch_size
-        self.size=size
+        self.size=self.img_h5.shape[0]
 
     def __len__(self):
         return(math.ceil(self.size/self.batch_size))
@@ -21,8 +23,6 @@ class Dataset(Sequence):
     def __getitem__(self, idx):
         start=idx*self.batch_size
         end=min((idx+1)*self.batch_size,self.size)
-        matrix_qu=HDF5Matrix(self.path,'question',start,end)
-        matrix_im=HDF5Matrix(self.path,'image',start,end)
-        answer_mat=to_categorical(np.array(HDF5Matrix(self.path,'answer',start,end)),num_classes=1000)
-        return ([matrix_qu,matrix_im],
+        answer_mat=to_categorical(np.array(self.ans_h5[start:end]),num_classes=1000)
+        return ([self.qu_h5[start:end],self.img_h5[start:end]],
                 answer_mat)
