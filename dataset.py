@@ -23,6 +23,7 @@ class Dataset(Sequence):
     def __getitem__(self, idx):
         start=idx*self.batch_size
         end=min((idx+1)*self.batch_size,self.size)
-        answer_mat=to_categorical(np.array(self.ans_h5[start:end]),num_classes=1000)
+        answers=np.array(self.ans_h5[start:end])
+        answer_mat=to_categorical(answers,num_classes=1000)
         return ([self.qu_h5[start:end],self.img_h5[start:end]],
                 answer_mat)

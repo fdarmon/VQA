@@ -15,37 +15,42 @@ questions_file='data_prepro.h5'
 features_imgs='data_img.h5'
 
 
-f=h5py.File(features_questions)
-ques_ft_id=np.array(f.get("ques_indexes"))
-ques_ft=np.array(f.get("features"))
+f1=h5py.File(features_questions,'r')
+ques_ft_id=f1.get("ques_indexes")
+ques_ft=f1.get("features")
 nb_qu,dim_qu=ques_ft.shape
 
 
-f.close()
 
-f=h5py.File(questions_file)
-img_corresp=np.array(f.get("img_pos_{}".format(config)))-1
-ques_corresp=np.array(f.get("question_id_{}".format(config)))
-answers=np.array(f.get('answers'))
+f2=h5py.File(questions_file,'r')
+img_corresp=f2.get("img_pos_{}".format(config))
+ques_corresp=f2.get("question_id_{}".format(config))
+ques_corresp_np=np.array(ques_corresp)
+answers=f2.get('answers')
 
-f.close()
-f=h5py.File(features_imgs)
-img_ft=np.array(f.get("images_{}".format(config)))
+f3=h5py.File(features_imgs,'r')
+img_ft=f3.get("images_{}".format(config))
 nb_img,dim_img = img_ft.shape
 
-f.close()
 im_table=np.zeros((nb_qu,dim_img))
+ques_table=np.zeros((nb_qu,dim_qu))
+
 # %%
 for i in range(nb_qu):
+    print(i)
     ####
     # We assume that ques_f_id and ques_corresp are the same
     ####
-    im_table[i,:]=img_ft[img_corresp[i],:]
+    ques_table[i,:]=ques_ft[i]
+    j = np.where(ques_corresp_np==ques_ft_id[i])[0][0]-1 # first indice dans data_prepro qui corresppond à l'identifiant
+    img_index=img_corresp[j]
+    print(j)
+    im_table[i,:]=img_ft[img_index]
 
 # %%
 
 f = h5py.File("dataset_{}".format(config),'w')
-f.create_dataset("question",dtype='float',data=ques_ft)
+f.create_dataset("question",dtype='float',data=ques_table)
 f.create_dataset("image",dtype='float',data=im_table)
 f.create_dataset("answer",dtype='int',data=answers)
 f.close()

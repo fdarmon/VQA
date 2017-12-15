@@ -13,7 +13,7 @@ from dataset import Dataset
 import h5py
 
 training_file='dataset_train.h5'
-batch_size=32
+batch_size=500
 dim_qu=2048
 dim_im=4096
 
@@ -40,7 +40,7 @@ lrs=LearningRateScheduler(lambda x: 3e-4*(0.5)**x)
 
 model.compile(optimizer=opt,loss='categorical_crossentropy',metrics=['accuracy','categorical_crossentropy'])
 
-model.fit_generator(dataset,epochs=10,workers=4,use_multiprocessing=True,callbacks=[lrs,])
+model.fit_generator(dataset,epochs=10,workers=1,use_multiprocessing=True)
 
 f.close()
 model.save('./trained_model')
