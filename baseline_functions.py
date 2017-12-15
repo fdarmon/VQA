@@ -196,50 +196,6 @@ def evaluate_KNN_W2V(num_test,k):
 
 
 
-### compute accuracy for all, yes/no, number and other questions
-
-def show_results(test_pred):
-    
-    ### Parameters ####
-    # test_pred : an array with the index of the predicted answer for each test sample
-    ## CAN BE OF ANY SIZE (test on 5000 samples or 100 000 samples)
-    
-    ### returns ####
-    #  accuracy for all, yes/no, number and other questions
-    
-    nb_correct={}
-    nb_correct['yes/no']=0
-    nb_correct['other']=0
-    nb_correct['number']=0
-    
-    nb={}
-    nb['yes/no']=0
-    nb['other']=0
-    nb['number']=0
-    
-    
-    for i in range(np.size(test_pred)):
-        
-        cat = test_true['cat'][i]        
-        nb[cat]+=1
-            
-        if (vocab_ans['%d'%test_pred[i]]==test_true['ans'][i]):
-            
-            nb_correct[cat] +=1
-    
-    all_precision = float(sum(nb_correct.values()))/np.size(test_pred)
-    
-    precision_yes = float(nb_correct['yes/no'])/nb['yes/no']
-    precision_number = float(nb_correct['number'])/nb['number']
-    precision_other = float(nb_correct['other'])/nb['other']
-    
-    
-    
-    
-    return all_precision,precision_yes,precision_number,precision_other
-                
-
-
 # In[2]:
 
 

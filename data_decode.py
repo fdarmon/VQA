@@ -102,4 +102,60 @@ def show_image_test(idx,data,img_pos_test):
     imgplot = plt.imshow(img)  
 
     
+### compute accuracy for all, yes/no, number and other questions
+
+def show_results(test_pred):
+    
+    ### Parameters ####
+    # test_pred : an array with the index of the predicted answer for each test sample
+    ## CAN BE OF ANY SIZE (test on 5000 samples or 100 000 samples)
+    
+    ### returns ####
+    #  accuracy for all, yes/no, number and other questions
+    ### test_true provides for each sampling test, the ground truth and the cartegory of questions
+
+    ### read test_answers json 
+    with open('data_train_val/mscoco_val2014_annotations.json') as f:
+        ans_test=json.load(f)
+
+    test_true = {}
+    test_true['ans']=[]
+    test_true['cat']=[]
+    
+    
+    for i in range(n_test):
+        test_true['ans'].append(ans_test['annotations'][i]['multiple_choice_answer'])
+        test_true['cat'].append(ans_test['annotations'][i]['answer_type'])
+        
+    nb_correct={}
+    nb_correct['yes/no']=0
+    nb_correct['other']=0
+    nb_correct['number']=0
+    
+    nb={}
+    nb['yes/no']=0
+    nb['other']=0
+    nb['number']=0
+    
+    
+    for i in range(np.size(test_pred)):
+        
+        cat = test_true['cat'][i]        
+        nb[cat]+=1
+            
+        if (vocab_ans['%d'%test_pred[i]]==test_true['ans'][i]):
+            
+            nb_correct[cat] +=1
+    
+    all_precision = float(sum(nb_correct.values()))/np.size(test_pred)
+    
+    precision_yes = float(nb_correct['yes/no'])/nb['yes/no']
+    precision_number = float(nb_correct['number'])/nb['number']
+    precision_other = float(nb_correct['other'])/nb['other']
+    
+    
+    
+    
+    return all_precision,precision_yes,precision_number,precision_other
+                
 
