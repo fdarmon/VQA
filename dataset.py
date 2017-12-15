@@ -24,6 +24,6 @@ class Dataset(Sequence):
         start=idx*self.batch_size
         end=min((idx+1)*self.batch_size,self.size)
         answers=np.array(self.ans_h5[start:end])
-        answer_mat=to_categorical(answers,num_classes=1000)
+        answer_mat=to_categorical(answers-1,num_classes=1000)
         return ([self.qu_h5[start:end],self.img_h5[start:end]],
                 answer_mat)

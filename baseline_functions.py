@@ -192,7 +192,40 @@ def evaluate_KNN_W2V(num_test,k):
     return test_pred
 
 
+#### KNN method using only the questions features given by the LSTM
 
+def find_KNN_features(k,idx_test):
+    
+    #### Parameters #####
+    # idx_test : index of the question considered in the test_set 
+    # k: parameters of KNN
+    
+    ### Returns #####
+    # idx : indices of the k nearest questions in the training set
+    
+    cosine_similarities = linear_kernel(ques_features_test[idx_test].reshape(1,2048), ques_features_train)
+    idx = np.argsort(cosine_similarities).squeeze()[-k:]
+    
+    return idx
+
+
+def evaluate_KNN_features(num_test):
+    
+    #### Parameters ####
+    # num_test : number of test samples used to evaluate : questions from 0 to num_test-1 are
+    # used to test.
+    
+    ### Returns ####
+    # test_pred : array of the index of the answer in the vocab for each test sample
+    
+    test_pred = np.zeros(num_test)
+    
+    for i in range(num_test):
+        
+        id_winner = find_KNN_features(1,i)
+        test_pred[i]= answers[id_winner]
+    
+    return test_pred
 
 
 
@@ -264,6 +297,45 @@ for i in range(n_test):
     ques_test_decoded.append(decode_question_test(i,ques_test,vocab))
 
 
+
+### read questions features given by the LSTM
+
+h = h5py.File("VQA/questions_features_train.h5",'r+')    
+keys=list(h.keys())
+tmp=[]
+for key in keys:
+    t=np.array(h.get(key))
+    tmp.append(t)
+
+ques_features_train = np.zeros((n_train,2048))
+
+for i in range(n_train):
+    
+    #pos = np.where(tmp[1] == ques_id_train[i])[0]
+    #ques_features_train[i,:]=tmp[0][pos]
+    ques_features_train[i,:]=tmp[0][i]
+    ques_features_train[i,:] = (1./lin.norm(ques_features_train[i,:]))*ques_features_train[i,:]
+
+
+h = h5py.File("VQA/questions_features_test.h5",'r+')    
+keys=list(h.keys())
+tmp=[]
+for key in keys:
+    t=np.array(h.get(key))
+    tmp.append(t)
+
+ques_features_test = np.zeros((n_test,2048))
+
+for i in range(n_test):
+    
+    #pos = np.where(tmp[1] == ques_id_test[i])[0]
+    #ques_features_test[i,:]=tmp[0][pos]
+    ques_features_test[i,:]=tmp[0][i]
+    ques_features_test[i,:]=(1./lin.norm(ques_features_test[i,:]))*ques_features_test[i,:]
+
+
+
+
     
 ### test_true provides for each sampling test, the ground truth and the cartegory of questions
 
@@ -324,4 +396,5 @@ test_pred_W2V = evaluate_KNN_W2V(num_test,k)
 print 'Accuracy results for KNN baseline with W2vec', show_results(test_pred_W2V)
 
 
-
+test_pred_features = evaluate_KNN_features(num_test)
+print 'Accuracy results with KNN using only LSTM features’,show_results(test_pred_features)
