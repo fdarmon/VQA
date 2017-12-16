@@ -26,29 +26,31 @@ def main(args):
 
     if args.load == None:
         qu=Input(shape=(dim_qu,),name="question_input")
-        x_qu = Dense(1024, activation='tanh')(qu)
+        x_qu = Dropout(0.5)(qu)
+        x_qu = Dense(1024, activation='tanh')(x_qu)
 
         im=Input(shape=(dim_im,),name="image_input")
         x_im = Norm_layer()(im)
+        x_im = Dropout(0.5)(x_im)
         x_im = Dense(1024, activation='tanh')(x_im)
 
         x = Multiply()([x_qu,x_im])
         x = Dropout(0.5)(x)
-        x = Dense(1000,activation='tanh')(x)
+        classif = Dense(1000,activation='softmax')(x)
         x = Dropout(0.5)(x)
-        x = Dense(1000,activation = 'tanh')(x)
-        classif = Activation('softmax')(x)
+        classif = Dense(1000,activation = 'softmax')(x)
+        #classif = Activation('softmax')(x)
         model=Model(inputs=[qu,im],outputs=classif)
 
     else :
-        model=load_model(args.load)
+        model=load_model(args.load,custom_objects={'Norm_layer':Norm_layer})
 
     opt=rmsprop(lr=args.lr)
     model.compile(optimizer=opt,loss='categorical_crossentropy',metrics=['accuracy'])
     l_callbacks=[]
 
     if args.decay_every>0:
-        l_callbacks.append(LearningRateScheduler(lambda x: args.lr*(0.2)**args.decay_every))
+        l_callbacks.append(LearningRateScheduler(lambda x: args.lr*5*(0.2)**args.decay_every))
     model.fit_generator(dataset,epochs=args.epochs,workers=1,use_multiprocessing=True,callbacks=l_callbacks)
 
     f.close()
