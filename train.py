@@ -25,22 +25,28 @@ def main(args):
     dataset=Dataset(f,batch_size)
 
     if args.load == None:
-        qu=Input(shape=(dim_qu,),name="question_input")
-        x_qu = Dropout(0.5)(qu)
-        x_qu = Dense(1024, activation='tanh')(x_qu)
+        if dataset.MCB:
+            x_mul=Input(shape=(dataset.dim_mcb,),name='mcb_input')
+        else:
+            qu=Input(shape=(dim_qu,),name="question_input")
+            x_qu = Dropout(0.5)(qu)
+            x_qu = Dense(1024, activation='tanh')(x_qu)
 
-        im=Input(shape=(dim_im,),name="image_input")
-        x_im = Norm_layer()(im)
-        x_im = Dropout(0.5)(x_im)
-        x_im = Dense(1024, activation='tanh')(x_im)
+            im=Input(shape=(dim_im,),name="image_input")
+            #x_im = Norm_layer()(im)
+            x_im = Dropout(0.5)(im)
+            x_im = Dense(1024, activation='tanh')(x_im)
 
-        x = Multiply()([x_qu,x_im])
-        x = Dropout(0.5)(x)
-        classif = Dense(1000,activation='softmax')(x)
+            x_mul = Multiply()([x_qu,x_im])
+        x = Dropout(0.5)(x_mul)
+        x = Dense(1000,activation='tanh')(x)
         x = Dropout(0.5)(x)
         classif = Dense(1000,activation = 'softmax')(x)
-        #classif = Activation('softmax')(x)
-        model=Model(inputs=[qu,im],outputs=classif)
+        if dataset.MCB:
+            inputs=x_mul
+        else:
+            inputs=[qu,im]
+        model=Model(inputs=inputs,outputs=classif)
 
     else :
         model=load_model(args.load,custom_objects={'Norm_layer':Norm_layer})

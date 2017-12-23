@@ -9,7 +9,9 @@ class Norm_layer(Layer):
         super(Norm_layer,self).build(input_shape)
 
     def call(self,x):
-        return K.l2_normalize(x,1)
+        #return K.l2_normalize(x,1)
+        return K.divide(x,K.sqrt(K.sum(K.square(x),1)))
+
 
     def compute_output_shape(self,input_shape):
         return input_shape

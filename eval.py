@@ -7,10 +7,9 @@ import argparse
 from data_decode import show_results
 
 def main(args):
-    if args.load is None:
-        assert(False)
-    else:
-        model=load_model(args.load)
+    assert(not args.load is None)
+    
+    model=load_model(args.load,custom_objects={'Norm_layer':Norm_layer})
 
     f=h5py.File(args.input)
     dataset=Dataset(f,args.bs)
