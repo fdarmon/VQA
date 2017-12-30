@@ -26,7 +26,10 @@ def main(args):
 
     if args.load == None:
         if dataset.MCB:
-            x_mul=Input(shape=(dataset.dim_mcb,),name='mcb_input')
+            x_in=Input(shape=(dataset.dim_mcb,),name='mcb_input')
+            x_mul=x_in
+            #x_mul = Norm_layer()(x_in)
+
         else:
             qu=Input(shape=(dim_qu,),name="question_input")
             x_qu = Dropout(0.5)(qu)
@@ -43,7 +46,7 @@ def main(args):
         x = Dropout(0.5)(x)
         classif = Dense(1000,activation = 'softmax')(x)
         if dataset.MCB:
-            inputs=x_mul
+            inputs=x_in
         else:
             inputs=[qu,im]
         model=Model(inputs=inputs,outputs=classif)
